@@ -7,20 +7,6 @@ var gameRunning ;
 var gameInterval , timeStep ,currTime,frameStep;
 var BAD_MOVE = 1 , ACE_MOVE = 2 , GOOD_MOVE = 3 ;
 var availablePixels ,currentCoin = [];
-var beep = document.createElement('audio'),
-	gameover = document.createElement('audio');
-
-//檢查瀏覽器可不可以播放音效
-if (!!(beep.canPlayType && beep.canPlayType('audio/mpeg;').replace(/no/,'')))
-{
-	beep.src = "beep.mp3";
-	gameover.src =  "gameover.mp3";
-}
-else
-{
-	beep.src = "beep.ogg";
-	gameover.src =  "gameover.ogg";
-}
 
 //在遊戲框中添加畫素(蛇的身體)
 for (var i = 0; i < disWidthInPixels; i++ )
@@ -55,23 +41,17 @@ var useNextRandomPixelForCoin = function ()
 	return true;
 
 };
-var releasePixel = function (x,y)
-{
-	$('div.pixel[data-x="' + x +'"][data-y="' + y +'"]').removeClass('taken');
-	availablePixels.push( x + '|' + y);
-};
 
-var tryAllocatingPixel = function (x, y)
+
+var tryAllocatingPixel = function (x,y)
 {
 	var ap = availablePixels ;
 	var p = x + '|' + y ;
 	//透過indexof()尋找物件的索引值
 	var idx =ap.indexOf(p);
-	
 	if (idx !== -1)
 	{
 		ap.splice(idx,1);
-		//data-y打成datd-y所以才錯誤
 		$('div.pixel[data-x="' + x + '"][data-y="' + y + '"]').addClass('taken');
 		return true;
 	}
@@ -81,7 +61,11 @@ var tryAllocatingPixel = function (x, y)
 	}
 };
 
-
+var releasePixel = function (x,y)
+{
+	$('div.pixel[data-x="' + x +'"][datd-y="' + y +'"]').removeClass('taken');
+	availablePixels.push( x + '|' + y);
+};
 
 var adjustSpeed = function (l)
 {
@@ -129,7 +113,7 @@ var snake = {
 		{
 			nextHead.push(head[0]);
 		}
-		//showMessage(nextHead,'');
+		
 		if (this.direction === DIR_UP)
 		{
 			nextHead.push(head[1] - 1);
@@ -143,12 +127,9 @@ var snake = {
 			nextHead.push(head[1]);
 		}
 		
-		//showMessage(nextHead,currentCoin);
-		if( nextHead[0] == currentCoin[0] && nextHead[1] == currentCoin[1])
+		if( nextHead[0] === currentCoin[0] && nextHead[1] === currentCoin[1])
 		{
-			
 			this.bodyPixels.push(nextHead);
-			beep.play();
 			adjustSpeed(this.bodyPixels.length);
 			if (useNextRandomPixelForCoin())
 			{
@@ -164,17 +145,14 @@ var snake = {
 		else if ( tryAllocatingPixel( nextHead[0] , nextHead[1]))
 		{
 			//沒有吃到東西，但是還是要將下一個畫素加進去蛇的身體
-			
-			//要去除尾巴
-			var tail = this.bodyPixels.splice(0, 1)[0];
-			//showMessage(this.bodyPixels.length,nextHead);
 			this.bodyPixels.push(nextHead);
+			//要去除尾巴
+			var tail = this.bodyPixels.splice(0,1)[0];
 			releasePixel(tail[0],tail[1]);
 			return GOOD_MOVE;
 		}
 		else
 		{
-			//showMessage('hi','');
 			return BAD_MOVE ;
 		}
 	}
@@ -220,12 +198,9 @@ var startMainLoop = function ()
 			var m = snake.move();
 			if ( m === BAD_MOVE)
 			{
-				//showMessage('hi','');
 				clearInterval(gameInterval);
 				gameRunning = false ;
-				gameover.play();
 				showMessage('Game over','Press space to start again');
-				
 			}
 			else if ( m === ACE_MOVE)
 			{
@@ -316,7 +291,7 @@ $(window).keydown(function(e)
 					snake.direction = DIR_LEFT;		
 	}
 	//j,turn right
-	else if (k === 74)
+	else if (k === 374)
 	{
 		e.preventDefault();
 		if (snake.direction === DIR_RIGHT)
